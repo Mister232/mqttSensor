@@ -6,9 +6,13 @@
 */
 
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "main.h"
 #include "esp8266.h"
 #include "uart_com.h"
+#include "net_conf.h"
 
 
 static WIFI_StateTypeDef wifi_state = _OFFLINE;
@@ -201,7 +205,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 	while (esp8266_HardwareReset(500) != _SUCCEED)
 	{
 		retry_count++;
-		HAL_Delay(500);
+		HAL_Delay(100);
 
 		if (retry_count > ESP8266_MAX_RETRY_TIME)
 		{
@@ -213,7 +217,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 		}
 	}
 
-	HAL_Delay(500);
+	HAL_Delay(100);
 	retry_count = 0;		// reset retry count
 
 
@@ -224,7 +228,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 	while (esp8266_TransmitCmd(TRANS_QUIT_CMD, TRANS_QUIT_CMD, ESP8266_MAX_TIMEOUT, WITHOUT_NEWLINE) != _SUCCEED)
 	{
 		retry_count++;
-		HAL_Delay(500);
+		HAL_Delay(100);
 
 		if (retry_count > ESP8266_MAX_RETRY_TIME)
 		{
@@ -236,7 +240,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 	}
 
 	trans_state = _TRANS_DISABLE;
-	HAL_Delay(500);
+	HAL_Delay(100);
 	retry_count = 0;		// reset retry count
 
 
@@ -247,7 +251,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 	while (esp8266_TransmitCmd((uint8_t*) "ATE0", OK_ACK, ESP8266_MAX_TIMEOUT, WITH_NEWLINE) != _SUCCEED)
 	{
 		retry_count++;
-		HAL_Delay(500);
+		HAL_Delay(100);
 
 		if (retry_count > ESP8266_MAX_RETRY_TIME)
 		{
@@ -258,7 +262,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 		}
 	}
 
-	HAL_Delay(500);
+	HAL_Delay(100);
 	retry_count = 0;		// reset retry count
 
 
@@ -269,7 +273,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 	while (esp8266_TransmitCmd((uint8_t*) "AT+CWMODE_CUR=1", OK_ACK, 1000, WITH_NEWLINE) != _SUCCEED)
 	{
 		retry_count++;
-		HAL_Delay(500);
+		HAL_Delay(100);
 
 		if (retry_count > ESP8266_MAX_RETRY_TIME)
 		{
@@ -280,7 +284,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 		}
 	}
 
-	HAL_Delay(500);
+	HAL_Delay(100);
 	retry_count = 0;		// reset retry count
 
 
@@ -291,7 +295,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 	while (esp8266_TransmitCmd((uint8_t*) "AT+CWAUTOCONN=0", OK_ACK, 1000, WITH_NEWLINE) != _SUCCEED)
 	{
 		retry_count++;
-		HAL_Delay(500);
+		HAL_Delay(100);
 
 		if (retry_count > ESP8266_MAX_RETRY_TIME)
 		{
@@ -302,7 +306,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 		}
 	}
 
-	HAL_Delay(500);
+	HAL_Delay(100);
 	retry_count = 0;		// reset retry count
 
 
@@ -313,7 +317,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 	while (esp8266_ConnectAP() != _ONLINE)
 	{
 		retry_count++;
-		HAL_Delay(500);
+		HAL_Delay(100);
 
 		if (retry_count > ESP8266_MAX_RETRY_TIME)
 		{
@@ -324,7 +328,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 		}
 	}
 
-	HAL_Delay(500);
+	HAL_Delay(100);
 	retry_count = 0;		// reset retry count
 
 
@@ -334,7 +338,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 		while (esp8266_TransmitCmd((uint8_t*) "AT+CWJAP_CUR?", OK_ACK, ESP8266_MAX_TIMEOUT, WITH_NEWLINE) != _SUCCEED)
 		{
 			retry_count++;
-			HAL_Delay(500);
+			HAL_Delay(100);
 
 			if (retry_count > ESP8266_MAX_RETRY_TIME / 2)
 			{
@@ -347,7 +351,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 		}
 	}
 
-	HAL_Delay(500);
+	HAL_Delay(100);
 	retry_count = 0;		// reset retry count
 
 
@@ -357,7 +361,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 		while (esp8266_TransmitCmd((uint8_t*) "	AT+CIPSTA_CUR?", OK_ACK, ESP8266_MAX_TIMEOUT, WITH_NEWLINE) != _SUCCEED)
 		{
 			retry_count++;
-			HAL_Delay(500);
+			HAL_Delay(100);
 
 			if (retry_count > ESP8266_MAX_RETRY_TIME / 2)
 			{
@@ -370,7 +374,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 		}
 	}
 
-	HAL_Delay(500);
+	HAL_Delay(100);
 	retry_count = 0;		// reset retry count
 
 
@@ -381,7 +385,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 	while (esp8266_TransmitCmd((uint8_t*) "AT+CWDHCP_CUR=1,1", OK_ACK, 1000, WITH_NEWLINE) != _SUCCEED)
 	{
 		retry_count++;
-		HAL_Delay(500);
+		HAL_Delay(100);
 
 		if (retry_count > ESP8266_MAX_RETRY_TIME)
 		{
@@ -392,7 +396,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 		}
 	}
 
-	HAL_Delay(500);
+	HAL_Delay(100);
 	retry_count = 0;
 
 
@@ -403,7 +407,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 	while (esp8266_TransmitCmd((uint8_t*) "AT+CIPMUX=0", OK_ACK, 1000, WITH_NEWLINE) != _SUCCEED)
 	{
 		retry_count++;
-		HAL_Delay(500);
+		HAL_Delay(100);
 
 		if (retry_count > ESP8266_MAX_RETRY_TIME)
 		{
@@ -414,7 +418,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 		}
 	}
 
-	HAL_Delay(500);
+	HAL_Delay(100);
 	retry_count = 0;
 
 
@@ -425,7 +429,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 	while (esp8266_TransmitCmd((uint8_t*) "AT+CIPMODE=1", OK_ACK, 1000, WITH_NEWLINE) != _SUCCEED)
 	{
 		retry_count++;
-		HAL_Delay(500);
+		HAL_Delay(100);
 
 		if (retry_count > ESP8266_MAX_RETRY_TIME)
 		{
@@ -436,7 +440,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 		}
 	}
 
-	HAL_Delay(500);
+	HAL_Delay(100);
 	retry_count = 0;
 
 
@@ -447,7 +451,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 	while (esp8266_ConnectServer() != _CONNECTED)
 	{
 		retry_count++;
-		HAL_Delay(500);
+		HAL_Delay(100);
 		if (retry_count > ESP8266_MAX_RETRY_TIME)
 		{
 			pc_printf("Connect TCP server failed\r\n");
@@ -457,7 +461,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 		}
 	}
 
-	HAL_Delay(500);
+	HAL_Delay(100);
 	retry_count = 0;
 
 
@@ -468,7 +472,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 	while (esp8266_TransmitCmd((uint8_t*) "AT+CIPSEND", OK_ACK, 1000, WITH_NEWLINE) != _SUCCEED)
 	{
 		retry_count++;
-		HAL_Delay(500);
+		HAL_Delay(100);
 		if (retry_count > ESP8266_MAX_RETRY_TIME)
 		{
 			pc_printf("Set transparent transmission mode failed\r\n");
@@ -479,7 +483,7 @@ WIFI_StateTypeDef esp8266_SetUpTCPConnection()
 	}
 
 	trans_state = _TRANS_ENBALE;
-	HAL_Delay(500);
+	HAL_Delay(100);
 	retry_count = 0;
 
 	return _SUCCEED;

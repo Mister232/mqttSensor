@@ -20,6 +20,8 @@
 #include "main.h"
 #include "uart_com.h"
 #include "esp8266.h"
+#include "mqttclient.h"
+#include "net_conf.h"
 
 
 // Private variables
@@ -35,7 +37,23 @@ static void MX_DMA_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART1_UART_Init(void);
 
-void toggle_LED(uint8_t toggleCNT, uint8_t timeout);
+void toggle_LED(uint8_t toggleCNT, int timeout);
+
+uint8_t wakedUp;
+
+// Callback function after wakeup
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	// Enable system tick
+	SystemClock_Config();
+	HAL_ResumeTick();
+	MX_GPIO_Init();
+	MX_DMA_Init();
+	MX_USART2_UART_Init();
+	MX_USART1_UART_Init();
+
+	wakedUp = 1;
+}
 
 
 /**
@@ -46,7 +64,6 @@ int main(void)
 {
 	// Local variables
 	uint8_t retry_count, conOK;
-
 
 	// Reset of all peripherals, Initializes the Flash interface and the Systick
 	HAL_Init();
@@ -60,63 +77,81 @@ int main(void)
 	MX_USART2_UART_Init();
 	MX_USART1_UART_Init();
 
-	// Reset variables
-	retry_count = 0;
-	conOK = 0;
-
 	pc_printf("Nucleo started\n\r");
 	toggle_LED(2, 200);
 
+	wakedUp = 0;
 
-	// Try to set up TCP connection
-	do
+	while(1)
 	{
-		if (esp8266_SetUpTCPConnection() == _SUCCEED)
+		if(wakedUp)
 		{
-			conOK = 1;
-			break;
+			pc_printf("System waked up\r\n");
+
+			// Reset variables
+			retry_count = 0;
+			conOK = 0;
+
+			// Try to set up TCP connection
+			do
+			{
+				if (esp8266_SetUpTCPConnection() == _SUCCEED)
+				{
+					conOK = 1;
+					break;
+				}
+
+				retry_count++;
+
+			} while(retry_count < CONNECTION_RETRYS);
+
+
+			// If the connection was successfully go on, otherwise hang on toggling LED
+			if(!conOK)
+			{
+				pc_printf("TCP connection failed!\n\r");
+
+				while (1)
+				{
+					toggle_LED(1, 1000);
+				}
+			}
+			else
+			{
+
+				pc_printf("TCP connection successfully\n\r");
+				toggle_LED(3, 200);
+
+
+				// Try to connect to MQTT broker
+				if (mqtt_ConnectServer() != 1)
+				{
+					pc_printf("Connect to MQTT broker failed!\r\n");
+
+					while (1)
+					{
+						toggle_LED(1, 1000);
+					}
+				}
+
+				pc_printf("Connection to MQTT broker successfully\n\r");
+				toggle_LED(3, 200);
+
+
+				pc_printf("Transmitting publish\r\n");
+
+				// Publish that the button was pressed
+				mqtt_TransmitPublish(MQTT_SUBSCRIBE_FOR, "Pressed");
+
+				HAL_Delay(1000);
+			}
 		}
 
-		retry_count++;
-
-	} while(retry_count < CONNECTION_RETRYS);
-
-
-	// If the connection was successfully go on, otherwise hang on toggling LED
-	if(!conOK)
-	{
-		pc_printf("TCP connection failed!\n\r");
-
-		while (1)
-		{
-			toggle_LED(1, 1000);
-		}
+		// Go to sleep an wait for button press
+		pc_printf("Going to sleep mode\n\r");
+		goToSleep();
 	}
-	else
-	{
 
-		pc_printf("TCP connection successfully\n\r");
-		toggle_LED(3, 200);
-
-
-		// Try to connect to MQTT broker
-//		if (mqtt_ConnectServer() != 1)
-//		{
-//			pc_printf("Connect to MQTT broker failed!\r\n");
-//
-//			while (1)
-//			{
-//				toggle_LED(1, 1000);
-//			}
-//		}
-//
-//		pc_printf("Connection to MQTT broker successfully\n\r");
-//		toggleLED(3, 200);
-		while(1)
-		{
-
-		}
-	}
 }
 
 
@@ -126,7 +161,7 @@ int main(void)
   * @param timeout: Timeout value in ms between toggling LED
   * @retval None
   */
-void toggle_LED(uint8_t toggleCNT, uint8_t timeout)
+void toggle_LED(uint8_t toggleCNT, int timeout)
 {
 	uint8_t i;
 

@@ -28,6 +28,7 @@
 
 // Exported functions prototypes
 void Error_Handler(void);
+extern void toggle_LED(uint8_t toggleCNT, int timeout);
 
 
 // Defines
@@ -56,11 +57,7 @@ void Error_Handler(void);
 #define CONNECTION_RETRYS 10
 #define DEBUG_MODE 1
 
-#define AP_SSID     (const char*)"SSID"
-#define AP_PSWD     (const char*)"PSWD"
-
-#define IpServer       "IP"
-#define ServerPort     "PORT"
+#define MQTT_SUBSCRIBE_FOR "NucleoButton"
 
 // Exported variables
 extern UART_HandleTypeDef huart1;

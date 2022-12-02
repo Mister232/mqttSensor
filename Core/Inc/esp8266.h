@@ -25,7 +25,7 @@
 #define WITH_NEWLINE     1
 #define WITHOUT_NEWLINE  0
 
-#define ESP8266_MAX_TIMEOUT     (uint16_t)0xffff
+#define ESP8266_MAX_TIMEOUT     (uint16_t)0x0fff
 #define ESP8266_MAX_RETRY_TIME  10
 
 
@@ -45,17 +45,6 @@ typedef enum __WIFI_StateTypDef {
 	_UNKNOWN_STATE = 0xee,
 	_UNKNOWN_ERROR = 0xff
 } WIFI_StateTypeDef;
-
-
-//extern uint8_t *esp8266_ack;
-
-//WIFI_StateTypeDef esp8266_CheckRespond(uint8_t *str);
-//WIFI_StateTypeDef esp8266_TransmitCmd(uint8_t *cmd, uint8_t *ack,
-//		uint32_t waittime, uint8_t newline);
-//WIFI_StateTypeDef esp8266_HardwareReset(uint32_t timeout);
-//WIFI_StateTypeDef esp8266_QuitTrans(void);
-//WIFI_StateTypeDef esp8266_ConnectAP(void);
-//WIFI_StateTypeDef esp8266_ConnectServer(void);
 
 // Function exports
 extern WIFI_StateTypeDef esp8266_SetUpTCPConnection(void);
