@@ -56,11 +56,11 @@ void Error_Handler(void);
 #define CONNECTION_RETRYS 10
 #define DEBUG_MODE 1
 
-#define AP_SSID     (const char*)"KatheHome"
-#define AP_PSWD     (const char*)"4%2aN8WE'%RZh;nU"
+#define AP_SSID     (const char*)"SSID"
+#define AP_PSWD     (const char*)"PSWD"
 
-#define IpServer       "192.168.178.63"
-#define ServerPort     "1883"
+#define IpServer       "IP"
+#define ServerPort     "PORT"
 
 // Exported variables
 extern UART_HandleTypeDef huart1;
